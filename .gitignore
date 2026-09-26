@@ -1,0 +1,18 @@
+# --- Secrets: never commit private keys, seed phrases or API keys ---
+keys/
+id.json
+*keypair*.json
+mint-*.json
+.env
+.env.*
+
+# --- Private notes: kept on this machine only ---
+CLAUDE_JOBLESSCOIN_HANDOFF.md
+*.private.md
+
+# --- Local-only / generated ---
+deployments/localnet.json
+deployments/archive/
+test-ledger/
+node_modules/
+*.log

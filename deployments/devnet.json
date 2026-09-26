@@ -1,0 +1,53 @@
+{
+  "cluster": "devnet",
+  "status": "distributed",
+  "mint": "EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi",
+  "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "decimals": "9",
+  "authority": "4YJcmmkztZNpyXdFsP8uTuy7RasMhEhTxEhznvpS5NCz",
+  "createdAt": "2026-09-26T10:00:46Z",
+  "signatures": {
+    "createMint": "3g35BtVpystvS2bsH5zU2AvzsYZVgT6ReMbnRtQCEPsetYLxgNSETzjkY55UKREqpPUHi65JzoSJ1rErJXQTxh4i",
+    "initializeMetadata": "3HdJAWtYsFmUTnawKhxQQhgajzotmZmyG9LbW5cm85mjdMZ2vrFVbzTcGhVjCnWdgrmoyqW9g4Tu2jUP8GKgaPP",
+    "createAccount": "66XhN95v61HEAUsX8xrWWmPAjszB7S9X7gKqJyLQ3pcb4GBqnbVmyC8HmBs8Nx3WHPbZa9ghoq6jgcaHD58ELuM6",
+    "mintSupply": "4XRbnQRdVvhM8fmZiWzov3AcCrBwSZcYV7aTWyt2wH8xYGTy6LTeEqYB51WKiuifdWqQuxGH2nhwarek9Z72gTo8"
+  },
+  "metadata": {
+    "name": "JoblessCoin",
+    "symbol": "JOB",
+    "uri": "https://deluxe-mochi-c9b389.netlify.app/joblesscoin.json"
+  },
+  "tokenAccount": "CpwRjCKAz35UnZMSktG4sqWeDxEBrLFELohfww9BQ4E2",
+  "supply": "1000000000",
+  "mintAuthorityDisabled": "false",
+  "allocations": {
+    "liquidity": {
+      "wallet": "6Rc9ucZTvoca24j8N3dwnCeDTXrb26skH34Ymxu3fqxb",
+      "percent": "90",
+      "amount": "900000000",
+      "signature": "3CCtfK43nMwrJvR7CuSmcAswtsoEG8RvH2VqGSz9XJyQid98UEJH9wigQbU5As5sPPa8QwQfiL4tZLWcZ1KEGLqT"
+    },
+    "community": {
+      "wallet": "Bon2EsBEQ2rwnjMMov4cWxRqQEGAKew8qDAWacT9ReHo",
+      "percent": "5",
+      "amount": "50000000",
+      "signature": "2AnmxFUBSZWjRwfeNWTomKhDa4KW9StRp4aya5zBb9HYdq49wSQnLsrnGjpKWqh1g5dqExn9fMWiJX8zGiHV1Qi7"
+    },
+    "development": {
+      "wallet": "2XPRr1ggK4FBtU7dES8YF1sEPBn4ra4QcfziaxPiaKzH",
+      "percent": "5",
+      "amount": "50000000",
+      "signature": "3ti6nhJLBQb7H87avZh6GvhfjQiE1NU25VHxvae1xFouJG9XVqDRmopa9FPvK6Ty4A4vumBmCai2KTm7F9F8Mdau",
+      "vesting": {
+        "provider": "streamflow",
+        "streamId": "9My1dgZ97dy1Rcvqokhb88GJCmK1V3jgmDm1VpCswG5i",
+        "signature": "57n1vxpBjngaao52Y885UdHKipsncfoHqdykCSjNVnnUbMWRhDuG3xtUo5oKBa1RK7Xq64xsA2AgCUdBtUbjDNA9",
+        "recipient": "2XPRr1ggK4FBtU7dES8YF1sEPBn4ra4QcfziaxPiaKzH",
+        "start": "1798194952",
+        "end": "1821954952",
+        "cliffDays": "90",
+        "totalDays": "365"
+      }
+    }
+  }
+}

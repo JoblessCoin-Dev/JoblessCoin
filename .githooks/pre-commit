@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Blocks commits that contain private keys, seed phrases or RPC/API keys.
+# Enabled per clone with: git config core.hooksPath .githooks
+# Tested by scripts/test-hook.sh; run it after changing this file.
+set -euo pipefail
+
+B58='1-9A-HJ-NP-Za-km-z'
+# Public transaction signatures are also 64 bytes of base58; they are allowed only as
+# values of these known fields in deployment records.
+SIGNATURE_FIELDS='"(signature|createMint|initializeMetadata|createAccount|mintSupply|disableMintAuthority)"[[:space:]]*:'
+
+blocked=0
+block() { echo "BLOCKED: $1: $2" >&2; blocked=1; }
+
+while IFS= read -r -d '' file; do
+  # Every file is scanned, binary or not: a key saved as "logo.png" is still a key.
+  content="$(git show ":$file" | tr -d '\0')"
+  compact="$(tr -d ' \t\r\n' <<<"$content")"
+
+  case "$(basename "$file")" in
+    id.json|*keypair*.json|.env|.env.*) block "$file" "file name looks like a key or secrets file" ;;
+  esac
+  if grep -aEq '\[([0-9]{1,3},){63}[0-9]{1,3}\]' <<<"$compact"; then
+    block "$file" "Solana keypair (64-number array)"
+  fi
+  if grep -aE "(^|[^$B58])[$B58]{86,88}([^$B58]|\$)" <<<"$content" | grep -avE "$SIGNATURE_FIELDS|sha512-" | grep -aq .; then
+    block "$file" "base58 private key (wallet export format)"
+  fi
+  if grep -aEq '(^|[^0-9a-fA-F])[0-9a-fA-F]{128}([^0-9a-fA-F]|$)' <<<"$content"; then
+    block "$file" "hex-encoded 64-byte secret key"
+  fi
+  if grep -aEq '^[^A-Za-z]*([a-z]{3,8}[ ,]+){11,23}[a-z]{3,8}[^A-Za-z]*$' <<<"$content"; then
+    block "$file" "looks like a 12-24 word seed phrase"
+  fi
+  if grep -aEiq 'api[-_]?key=[A-Za-z0-9_-]{16,}|/v[0-9]/[A-Za-z0-9_-]{24,}|quiknode\.pro/[A-Za-z0-9]{16,}|(secret|private)[_-]?key["'\'']?[[:space:]]*[:=][[:space:]]*["'\'']?[A-Za-z0-9+/_-]{16,}' <<<"$content"; then
+    block "$file" "RPC/API key or secret"
+  fi
+done < <(git diff --cached --name-only -z --diff-filter=ACMR)
+
+if (( blocked )); then
+  echo "Commit aborted. Remove the secret; if it was ever pushed or shared, rotate it." >&2
+  exit 1
+fi

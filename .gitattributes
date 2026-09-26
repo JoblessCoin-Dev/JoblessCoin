@@ -1,0 +1,4 @@
+# Scripts run in WSL/Linux: always check out with LF line endings, even on Windows.
+* text=auto eol=lf
+*.png binary
+*.jpg binary

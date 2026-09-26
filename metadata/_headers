@@ -1,0 +1,17 @@
+# Netlify response headers for the token metadata site.
+# Deployed together with the rest of this folder.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'none'; img-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'
+
+# Wallets and explorers fetch these from the browser, so they must allow cross-origin reads.
+/joblesscoin.json
+  Access-Control-Allow-Origin: *
+  Content-Type: application/json; charset=utf-8
+
+/joblesscoin-token-2048px.png
+  Access-Control-Allow-Origin: *
