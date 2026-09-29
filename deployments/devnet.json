@@ -50,6 +50,11 @@
           "userLpVault": "26dPK4tVmxEd3tMQWxr1vxa6L9wQY8Yotb3CkwXJiv8H",
           "lockLpVault": "CT5Px5qm2BFgLLdBP6BvmdWJTRFrG1D2cx5yZgvtf6U2",
           "lockedAt": "2026-09-29T11:56:56Z"
+        },
+        "lastFeeClaim": {
+          "signature": "3bsn6QghsDntPnooV3xq1GksgFKAPM546DXAvwVaWdgykCtDFm7xkoqSY1VLSZf486okzkViytqAqMXmT7AN6N4s",
+          "lpAmount": "12072783320",
+          "at": "2026-09-29T15:35:48Z"
         }
       }
     },

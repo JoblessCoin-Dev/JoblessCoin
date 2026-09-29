@@ -172,6 +172,31 @@ echo; echo "==> safety: a second LP lock must be refused"
 if CONFIRM_BURN=burn "$HERE/lock-liquidity.sh" localnet >/dev/null 2>&1; then fail "second LP lock allowed"; fi
 pass "double LP lock refused"
 
+echo; echo "==> safety: collecting fees before any trades must be refused"
+if "$HERE/collect-fees.sh" localnet --collect >/dev/null 2>&1; then fail "collected fees from nothing"; fi
+pass "nothing to collect before trades"
+
+echo; echo "==> test-swap.sh (buy, sell, buy)"
+"$HERE/test-swap.sh" localnet buy 1 || fail "test buy"
+"$HERE/test-swap.sh" localnet sell 20000000 || fail "test sell"
+"$HERE/test-swap.sh" localnet buy 0.5 || fail "second test buy"
+pass "test trades executed against the pool"
+
+echo; echo "==> safety: test swaps must refuse mainnet"
+if JOB_ALLOW_MAINNET=I_UNDERSTAND_REAL_MONEY KEYPAIR=usb://ledger "$HERE/test-swap.sh" mainnet buy 1 >/dev/null 2>&1; then
+  fail "test swap allowed on mainnet"
+fi
+pass "mainnet test swaps refused"
+
+echo; echo "==> collect-fees.sh"
+"$HERE/collect-fees.sh" localnet || fail "fee preview"
+LIQ_JOB_BEFORE="$(spl-token balance "$MINT" --owner "$LIQ" --url "$RPC_URL" 2>/dev/null || echo 0)"
+"$HERE/collect-fees.sh" localnet --collect || fail "collect-fees.sh --collect"
+LIQ_JOB_AFTER="$(spl-token balance "$MINT" --owner "$LIQ" --url "$RPC_URL")"
+python3 -c 'import sys; sys.exit(0 if float(sys.argv[2]) > float(sys.argv[1]) else 1)' "$LIQ_JOB_BEFORE" "$LIQ_JOB_AFTER" \
+  || fail "no JOB fees arrived ($LIQ_JOB_BEFORE -> $LIQ_JOB_AFTER)"
+pass "trading fees collected to the liquidity wallet ($LIQ_JOB_BEFORE -> $LIQ_JOB_AFTER JOB); liquidity stays locked"
+
 echo; echo "==> finalize-mint.sh"
 CONFIRM_MINT="$MINT" "$HERE/finalize-mint.sh" localnet || fail "finalize-mint.sh"
 pass "mint authority disabled and final verification passed"

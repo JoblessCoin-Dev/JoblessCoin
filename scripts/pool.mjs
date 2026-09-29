@@ -5,6 +5,9 @@
 //   node scripts/pool.mjs create  -> {"poolId", "lpMint", "vaultA", "vaultB", "signature", ...}
 //   node scripts/pool.mjs lock    -> {"signature", "lpAmount", "nftMint", ...}  (Burn & Earn)
 //   node scripts/pool.mjs info    -> pool reserves, LP supply, owner/locked LP balances
+//   node scripts/pool.mjs swap    -> test trade (buy = SOL->JOB, sell = JOB->SOL)
+//   node scripts/pool.mjs fees    -> trading fees claimable by the Fee Key NFT
+//   node scripts/pool.mjs harvest -> collect those fees to the Fee Key holder
 import { readFileSync } from "node:fs";
 import BN from "bn.js";
 
@@ -19,7 +22,7 @@ console.log = console.info = console.debug = console.warn = toStderr;
 const { Connection, Keypair, PublicKey } = await import("@solana/web3.js");
 const { NATIVE_MINT, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, getAssociatedTokenAddressSync } = await import("@solana/spl-token");
 const {
-  Raydium, TxVersion, DEVNET_PROGRAM_ID, CpmmConfigInfoLayout, getCpmmPdaAmmConfigId,
+  Raydium, TxVersion, DEVNET_PROGRAM_ID, CpmmConfigInfoLayout, getCpmmPdaAmmConfigId, CurveCalculator, FeeOn,
 } = await import("@raydium-io/raydium-sdk-v2");
 
 // Localnet tests run against Raydium's devnet programs cloned into the validator,
@@ -146,7 +149,113 @@ async function info() {
   return out;
 }
 
-const commands = { create, lock, info };
+async function swap() {
+  const owner = loadOwner();
+  const raydium = await sdk(owner);
+  const { poolInfo, poolKeys, rpcData } = await raydium.cpmm.getPoolInfoFromRpc(env("JC_POOL_ID"));
+  const side = env("JC_SIDE");
+  if (side !== "buy" && side !== "sell") throw new Error("JC_SIDE must be buy or sell");
+  const inputMint = side === "buy" ? NATIVE_MINT.toBase58() : env("JC_MINT");
+  const baseIn = inputMint === poolInfo.mintA.address;
+  const inputAmount = new BN(env("JC_AMOUNT_BASE"));
+  const c = rpcData.configInfo;
+  const quote = CurveCalculator.swapBaseInput(
+    inputAmount,
+    baseIn ? rpcData.baseReserve : rpcData.quoteReserve,
+    baseIn ? rpcData.quoteReserve : rpcData.baseReserve,
+    c.tradeFeeRate, c.creatorFeeRate, c.protocolFeeRate, c.fundFeeRate,
+    rpcData.feeOn === FeeOn.BothToken || rpcData.feeOn === FeeOn.OnlyTokenB,
+  );
+  const { execute } = await raydium.cpmm.swap({
+    poolInfo, poolKeys, inputAmount, swapResult: quote, baseIn,
+    slippage: Number(process.env.JC_SLIPPAGE ?? "0.01"),
+    txVersion: TxVersion.V0,
+  });
+  const { txId } = await execute({ sendAndConfirm: true });
+  return {
+    signature: txId, side,
+    inputAmount: quote.inputAmount.toString(),
+    outputAmount: quote.outputAmount.toString(),
+    tradeFee: quote.tradeFee.toString(),
+  };
+}
+
+// Burn & Earn lock account (LockedCpLiquidityState), decoded from the chain:
+//   8-byte discriminator | lockedLp u64 | claimedLp u64 | unclaimedLp u64 | lastLp u64 |
+//   lastK u128 | recentEpoch u64 | poolId | feeNftMint | lockedOwner | lpMint (32 bytes each)
+async function lockState(lockPda) {
+  const a = await connection.getAccountInfo(new PublicKey(lockPda));
+  if (!a || !a.owner.equals(LOCK_PROGRAM)) throw new Error(`${lockPda} is not a Burn & Earn lock account`);
+  const d = a.data;
+  const u64 = (o) => new BN(d.subarray(o, o + 8), "le");
+  return {
+    lockedLp: u64(8), claimedLp: u64(16), unclaimedLp: u64(24), lastLp: u64(32),
+    lastK: new BN(d.subarray(40, 56), "le"),
+    poolId: new PublicKey(d.subarray(64, 96)).toBase58(),
+    nftMint: new PublicKey(d.subarray(96, 128)).toBase58(),
+  };
+}
+
+// The locked position's underlying value grows with sqrt(k)/lpSupply as trades pay fees.
+// Fees in LP terms = what can be taken out while leaving the originally locked value in place:
+//   principalLp = lockedLp * sqrt(lastK) / lastLp * currentLp / sqrt(currentK)
+// Rounded down (and 1 unit kept back) so we never ask for more than the program allows.
+async function claimable(raydium, lockPda) {
+  const lock = await lockState(lockPda);
+  const { poolInfo, poolKeys, rpcData } = await raydium.cpmm.getPoolInfoFromRpc(lock.poolId);
+  const currentK = rpcData.baseReserve.mul(rpcData.quoteReserve);
+  const currentLp = rpcData.lpAmount;
+  const principal = lock.lockedLp.mul(sqrtBN(lock.lastK)).mul(currentLp)
+    .div(lock.lastLp.mul(sqrtBN(currentK)));
+  let accrued = lock.lockedLp.sub(principal).subn(1);
+  if (accrued.isNeg()) accrued = new BN(0);
+  const feeLp = accrued.add(lock.unclaimedLp);
+  return {
+    lock, poolInfo, poolKeys, feeLp,
+    estJob: feeLp.mul(poolInfo.mintA.address === NATIVE_MINT.toBase58() ? rpcData.quoteReserve : rpcData.baseReserve).div(currentLp),
+    estSol: feeLp.mul(poolInfo.mintA.address === NATIVE_MINT.toBase58() ? rpcData.baseReserve : rpcData.quoteReserve).div(currentLp),
+  };
+}
+
+function sqrtBN(n) {  // integer square root (floor)
+  if (n.isZero()) return new BN(0);
+  let x = new BN(1).shln(Math.ceil(n.bitLength() / 2));
+  for (;;) {
+    const y = x.add(n.div(x)).shrn(1);
+    if (y.gte(x)) return x;
+    x = y;
+  }
+}
+
+async function fees() {
+  const c = await claimable(await sdk(), env("JC_LOCK_PDA"));
+  return {
+    lockedLp: c.lock.lockedLp.toString(), claimedLp: c.lock.claimedLp.toString(),
+    claimableLp: c.feeLp.toString(), estJob: c.estJob.toString(), estSol: c.estSol.toString(),
+  };
+}
+
+async function harvest() {
+  const owner = loadOwner();
+  const raydium = await sdk(owner);
+  const c = await claimable(raydium, env("JC_LOCK_PDA"));
+  if (c.feeLp.isZero()) throw new Error("no trading fees to collect yet");
+  const { execute } = await raydium.cpmm.harvestLockLp({
+    programId: LOCK_PROGRAM,
+    authProgram: LOCK_AUTH,
+    cpmmProgram: { programId: CPMM_PROGRAM, authProgram: DEVNET_PROGRAM_ID.CREATE_CPMM_POOL_AUTH },
+    poolInfo: c.poolInfo,
+    poolKeys: c.poolKeys,
+    nftMint: new PublicKey(c.lock.nftMint),
+    lpFeeAmount: c.feeLp,
+    closeWsol: true,
+    txVersion: TxVersion.V0,
+  });
+  const { txId } = await execute({ sendAndConfirm: true });
+  return { signature: txId, lpFeeAmount: c.feeLp.toString(), estJob: c.estJob.toString(), estSol: c.estSol.toString() };
+}
+
+const commands = { create, lock, info, swap, fees, harvest };
 const command = commands[process.argv[2]];
 if (!command) {
   console.error(`usage: node scripts/pool.mjs <${Object.keys(commands).join("|")}>`);

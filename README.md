@@ -43,6 +43,8 @@ scripts/vesting.mjs     Streamflow helper used by the scripts above (Node.js)
 scripts/create-pool.sh  create the JOB/SOL Raydium pool with the 90% liquidity allocation
 scripts/lock-liquidity.sh lock all LP tokens forever with Raydium Burn & Earn (fees stay claimable)
 scripts/pool.mjs        Raydium helper used by the pool scripts (Node.js)
+scripts/collect-fees.sh show / collect the trading fees earned by the locked liquidity
+scripts/test-swap.sh    test trades on localnet/devnet only (never mainnet)
 scripts/finalize-mint.sh permanently disable the mint authority
 scripts/test-localnet.sh end-to-end test on a throwaway local validator
 scripts/test-hook.sh    attack-tests the pre-commit secret scanner
@@ -67,6 +69,8 @@ npm ci                                 # once: installs the pinned vesting depen
 scripts/lock-development.sh devnet     # 90-day cliff, fully vested at 365 days; asks you to type 'lock'
 scripts/create-pool.sh devnet          # JOB/SOL pool, POOL_SEED_SOL in config; asks you to type 'pool'
 scripts/lock-liquidity.sh devnet       # permanent LP lock; asks you to type 'burn'
+scripts/test-swap.sh devnet buy 1      # test trade: spend 1 SOL on JOB (or: sell <JOB amount>)
+scripts/collect-fees.sh devnet         # show claimable fees; add --collect to claim them
 scripts/finalize-mint.sh devnet        # irreversible, asks you to type the mint address
 ```
 
