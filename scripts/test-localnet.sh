@@ -35,6 +35,13 @@ STREAMFLOW_CLONES=(
   --clone Aa2JJfFzUN3V54DXUHRBJowFw416xfZHpPk9DaNy3iYs                      # fee oracle
   --clone 5SEpbdjFK5FxwTvfsGMXVQTD2v4M2c5tyRTxhdsPkgDw                      # treasury
   --clone wdrwhnCv4pzW8beKsbPa4S2UDZrXenjg16KJdKSpb5u                       # withdrawor
+  # Raydium CPMM + Burn & Earn (devnet), for the liquidity pool steps.
+  --clone-upgradeable-program DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb   # CPMM
+  --clone 5MxLgy9oPdTC3YgkiePHqr3EoCRD9uLVYRQS2ANAs7wy                      # CPMM fee config 0
+  --clone 3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy                      # CPMM creation-fee account
+  --clone-upgradeable-program DRay25Usp3YJAi7beckgpGUC7mGJ2cR1AVPxhYfwVCUX   # Burn & Earn lock
+  --clone 7qWVV8UY2bRJfDLP4s37YzBPKUkVB46DStYJBpYbQzu3                      # lock authority
+  --clone-upgradeable-program metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s   # Metaplex (Fee Key NFT)
 )
 
 echo "==> Starting throwaway validator on port $PORT (ledger in $WORK)"
@@ -53,7 +60,7 @@ solana genesis-hash --url "$RPC_URL" >/dev/null 2>&1 || fail "validator did not 
 
 export KEYPAIR="$WORK/payer.json" KEYS_DIR="$WORK/keys" DEPLOYMENTS_DIR="$WORK/deployments"
 solana-keygen new --no-bip39-passphrase --silent -o "$KEYPAIR" >/dev/null
-solana airdrop 10 "$(solana-keygen pubkey "$KEYPAIR")" --url "$RPC_URL" >/dev/null
+solana airdrop 100 "$(solana-keygen pubkey "$KEYPAIR")" --url "$RPC_URL" >/dev/null
 
 echo; echo "==> create-token.sh"
 "$HERE/create-token.sh" localnet || fail "create-token.sh"
@@ -130,6 +137,40 @@ pass "development allocation locked in irrevocable vesting and verified"
 echo; echo "==> safety: a second lock must be refused"
 if CONFIRM_LOCK=lock "$HERE/lock-development.sh" localnet >/dev/null 2>&1; then fail "second lock allowed"; fi
 pass "double lock refused"
+
+echo; echo "==> safety: creating the pool without enough SOL must fail cleanly"
+if CONFIRM_POOL=pool "$HERE/create-pool.sh" localnet >/dev/null 2>&1; then fail "pool created without SOL"; fi
+pass "unfunded pool creation refused"
+
+# Enough for whatever POOL_SEED_SOL is configured, plus Raydium's fee and account rent.
+solana transfer "$LIQ" "$(awk -v s="$(grep -E '^POOL_SEED_SOL=' "$HERE/../config/token.env" | cut -d= -f2)" 'BEGIN{print s + 0.5}')" \
+  --url "$RPC_URL" --keypair "$KEYPAIR" --allow-unfunded-recipient >/dev/null
+
+echo; echo "==> safety: wrong confirmation must not create the pool"
+if CONFIRM_POOL="no" "$HERE/create-pool.sh" localnet >/dev/null 2>&1; then fail "pool created without confirmation"; fi
+[[ "$(spl-token balance "$MINT" --owner "$LIQ" --url "$RPC_URL")" == "900000000" ]] || fail "tokens moved without confirmation"
+pass "nothing pooled without confirmation"
+
+echo; echo "==> create-pool.sh"
+CONFIRM_POOL=pool "$HERE/create-pool.sh" localnet || fail "create-pool.sh"
+[[ "$(spl-token balance "$MINT" --owner "$LIQ" --url "$RPC_URL")" == "0" ]] || fail "liquidity tokens not pooled"
+pass "JOB/SOL pool created with the whole liquidity allocation and verified"
+
+echo; echo "==> safety: a second pool must be refused"
+if CONFIRM_POOL=pool "$HERE/create-pool.sh" localnet >/dev/null 2>&1; then fail "second pool allowed"; fi
+pass "duplicate pool refused"
+
+echo; echo "==> safety: wrong confirmation must not lock the LP"
+if CONFIRM_BURN="no" "$HERE/lock-liquidity.sh" localnet >/dev/null 2>&1; then fail "LP locked without confirmation"; fi
+pass "nothing locked without confirmation"
+
+echo; echo "==> lock-liquidity.sh"
+CONFIRM_BURN=burn "$HERE/lock-liquidity.sh" localnet || fail "lock-liquidity.sh"
+pass "LP permanently locked (Burn & Earn) and verified"
+
+echo; echo "==> safety: a second LP lock must be refused"
+if CONFIRM_BURN=burn "$HERE/lock-liquidity.sh" localnet >/dev/null 2>&1; then fail "second LP lock allowed"; fi
+pass "double LP lock refused"
 
 echo; echo "==> finalize-mint.sh"
 CONFIRM_MINT="$MINT" "$HERE/finalize-mint.sh" localnet || fail "finalize-mint.sh"

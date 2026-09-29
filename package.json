@@ -1,12 +1,14 @@
 {
   "name": "joblesscoin",
   "private": true,
-  "description": "JoblessCoin ($JOB) tooling: Streamflow vesting helper for scripts/lock-development.sh",
+  "description": "JoblessCoin ($JOB) tooling: Streamflow vesting and Raydium pool helpers used by scripts/*.sh",
   "type": "module",
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
+    "@raydium-io/raydium-sdk-v2": "0.2.73-alpha",
+    "@solana/spl-token": "0.4.9",
     "@solana/web3.js": "1.98.4",
     "@streamflow/stream": "13.4.0",
     "bn.js": "5.2.3"

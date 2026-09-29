@@ -23,7 +23,7 @@ It is a memecoin: it has no promised utility and no promised returns.
 | Network | Mint | Status |
 |---|---|---|
 | Localnet | created per test run | ✅ scripts tested end to end |
-| Devnet | [`EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi`](https://explorer.solana.com/address/EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi?cluster=devnet) | ✅ created & verified · supply minted · mint authority kept until distribution |
+| Devnet | [`EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi`](https://explorer.solana.com/address/EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi?cluster=devnet) | ✅ full rehearsal complete: 90/5/5 distributed, JOB/SOL [Raydium pool](https://explorer.solana.com/address/3VHUXJ2kXmK5imVb1DsdAUEFiFqkJaJ5ZEHvSiinTpTD?cluster=devnet) (900M JOB + 8 SOL) with LP locked forever, dev 5% in irrevocable vesting, mint authority disabled |
 | Mainnet | — | 🔒 locked (see below) |
 
 Every deployment is recorded with its addresses and transaction signatures in
@@ -40,6 +40,9 @@ scripts/create-wallets.sh create the liquidity / community / development wallets
 scripts/distribute.sh   send the 90 / 5 / 5 allocations (safe to re-run, never double-sends)
 scripts/lock-development.sh lock the 5% dev allocation in irrevocable Streamflow vesting
 scripts/vesting.mjs     Streamflow helper used by the scripts above (Node.js)
+scripts/create-pool.sh  create the JOB/SOL Raydium pool with the 90% liquidity allocation
+scripts/lock-liquidity.sh lock all LP tokens forever with Raydium Burn & Earn (fees stay claimable)
+scripts/pool.mjs        Raydium helper used by the pool scripts (Node.js)
 scripts/finalize-mint.sh permanently disable the mint authority
 scripts/test-localnet.sh end-to-end test on a throwaway local validator
 scripts/test-hook.sh    attack-tests the pre-commit secret scanner
@@ -62,6 +65,8 @@ scripts/create-wallets.sh devnet       # allocation wallets (keys stored outside
 scripts/distribute.sh devnet           # asks you to type 'distribute'
 npm ci                                 # once: installs the pinned vesting dependencies
 scripts/lock-development.sh devnet     # 90-day cliff, fully vested at 365 days; asks you to type 'lock'
+scripts/create-pool.sh devnet          # JOB/SOL pool, POOL_SEED_SOL in config; asks you to type 'pool'
+scripts/lock-liquidity.sh devnet       # permanent LP lock; asks you to type 'burn'
 scripts/finalize-mint.sh devnet        # irreversible, asks you to type the mint address
 ```
 
@@ -80,6 +85,7 @@ hash, so a Devnet command can't accidentally run against Mainnet, or the reverse
 - **No freeze authority and no risky extensions:** verification fails if any appear.
 - **No duplicate mints:** `create-token.sh` refuses to create a second mint on a network that already has one.
 - **Irreversible steps need typed confirmation.**
+- **Liquidity can't be pulled:** the pool's LP tokens are locked forever with Raydium Burn & Earn; `verify-token.sh` checks the pool and that the LP left the wallet.
 - **Team tokens are locked:** the 5% development allocation vests over 12 months (3-month cliff) in a Streamflow contract nobody can cancel. `verify-token.sh` reads the contract on-chain and checks it.
 - **Mainnet is locked:** it needs `JOB_ALLOW_MAINNET=I_UNDERSTAND_REAL_MONEY` **and** a hardware wallet (`KEYPAIR=usb://ledger`).
 - **Secrets stay out of git:** `.gitignore` plus a pre-commit hook that scans for keypairs and API keys.
@@ -90,7 +96,7 @@ See [SECURITY.md](SECURITY.md) for the full security policy and personal checkli
 
 1. ✅ Local Token-2022 mint, metadata, logo
 2. ✅ Reproducible scripts + automated tests
-3. ⏳ Devnet: ✅ create, ✅ verify, ✅ 90/5/5 allocations, ✅ dev vesting, ⬜ test pool, ⬜ finalize
+3. ✅ Devnet: create, verify, 90/5/5 allocations, dev vesting, pool + permanent LP lock, finalize
 4. ⬜ Devnet rehearsal: Squads multisig treasury
 5. ⬜ Permanent metadata (Arweave/IPFS), own domain, website with a transparency page
 6. ⬜ Pre-Mainnet: Ledger hardware wallet, legal/tax advice, final review

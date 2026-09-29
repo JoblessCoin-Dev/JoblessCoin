@@ -1,6 +1,6 @@
 {
   "cluster": "devnet",
-  "status": "distributed",
+  "status": "finalized",
   "mint": "EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi",
   "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
   "decimals": "9",
@@ -10,7 +10,8 @@
     "createMint": "3g35BtVpystvS2bsH5zU2AvzsYZVgT6ReMbnRtQCEPsetYLxgNSETzjkY55UKREqpPUHi65JzoSJ1rErJXQTxh4i",
     "initializeMetadata": "3HdJAWtYsFmUTnawKhxQQhgajzotmZmyG9LbW5cm85mjdMZ2vrFVbzTcGhVjCnWdgrmoyqW9g4Tu2jUP8GKgaPP",
     "createAccount": "66XhN95v61HEAUsX8xrWWmPAjszB7S9X7gKqJyLQ3pcb4GBqnbVmyC8HmBs8Nx3WHPbZa9ghoq6jgcaHD58ELuM6",
-    "mintSupply": "4XRbnQRdVvhM8fmZiWzov3AcCrBwSZcYV7aTWyt2wH8xYGTy6LTeEqYB51WKiuifdWqQuxGH2nhwarek9Z72gTo8"
+    "mintSupply": "4XRbnQRdVvhM8fmZiWzov3AcCrBwSZcYV7aTWyt2wH8xYGTy6LTeEqYB51WKiuifdWqQuxGH2nhwarek9Z72gTo8",
+    "disableMintAuthority": "2kT6tHN8aENtxPYRXeihjsH1XJHxU3gsrbJrtbtkaS3ambVdnshZY76gXUbvXi6o5BQPwsSwRFMkAzqvKhR9EB1T"
   },
   "metadata": {
     "name": "JoblessCoin",
@@ -19,13 +20,38 @@
   },
   "tokenAccount": "CpwRjCKAz35UnZMSktG4sqWeDxEBrLFELohfww9BQ4E2",
   "supply": "1000000000",
-  "mintAuthorityDisabled": "false",
+  "mintAuthorityDisabled": "true",
   "allocations": {
     "liquidity": {
       "wallet": "6Rc9ucZTvoca24j8N3dwnCeDTXrb26skH34Ymxu3fqxb",
       "percent": "90",
       "amount": "900000000",
-      "signature": "3CCtfK43nMwrJvR7CuSmcAswtsoEG8RvH2VqGSz9XJyQid98UEJH9wigQbU5As5sPPa8QwQfiL4tZLWcZ1KEGLqT"
+      "signature": "3CCtfK43nMwrJvR7CuSmcAswtsoEG8RvH2VqGSz9XJyQid98UEJH9wigQbU5As5sPPa8QwQfiL4tZLWcZ1KEGLqT",
+      "pool": {
+        "signature": "4rDJN7Ku36xwVvThH5iVbfZEKDEuFybj5Zs82mGEcdCa2DdThPenTzuprYkhtVazo8ENkn9ZHj1dAeCscaYGVVap",
+        "programId": "DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb",
+        "poolId": "3VHUXJ2kXmK5imVb1DsdAUEFiFqkJaJ5ZEHvSiinTpTD",
+        "lpMint": "HuXF8Sp2ymXxyFw2fZQwSGm5zPNk5fp6SCYH62jsN5vL",
+        "vaultA": "5H66X8rDtCCBu2r7hyEBE7Y52KE5Hy2TkcMiCfdnvPZg",
+        "vaultB": "3f6WzdB6NrHvULQ8CchS9hzJzscuJuFyomNKSV9Ys9FP",
+        "configId": "5MxLgy9oPdTC3YgkiePHqr3EoCRD9uLVYRQS2ANAs7wy",
+        "tradeFeeRate": "2500",
+        "dex": "raydium-cpmm",
+        "seedLamports": "8000000000",
+        "tokenAmount": "900000000",
+        "createdAt": "2026-09-29T11:53:09Z",
+        "lock": {
+          "signature": "4PX91JeMAfc8s7e5vNdpmQWhL87LJ1UC6uBCUZpqqHVjSqdSD2Ts3cKhrMhqdYKRdNrs1udCj24ot7cKmtss2HRB",
+          "lpAmount": "84852813742285",
+          "nftMint": "EqVeNfsuFs2GZ22oky6TYKNVLj78wMAyGYYPZWVnTrns",
+          "nftAccount": "E55FCMWtSN4JbSzMn55DMfsvZAgsfjQEjDvnY22afdxF",
+          "metadataAccount": "EApjTNYhuWRafftPRSp3pwrnqeCvhobP3WSrqn86PAW1",
+          "lockPda": "Dkkxrts1zsbvr6UjbBeTfrDYGEFoMqvArCrmA6Z7uC1n",
+          "userLpVault": "26dPK4tVmxEd3tMQWxr1vxa6L9wQY8Yotb3CkwXJiv8H",
+          "lockLpVault": "CT5Px5qm2BFgLLdBP6BvmdWJTRFrG1D2cx5yZgvtf6U2",
+          "lockedAt": "2026-09-29T11:56:56Z"
+        }
+      }
     },
     "community": {
       "wallet": "Bon2EsBEQ2rwnjMMov4cWxRqQEGAKew8qDAWacT9ReHo",

@@ -134,6 +134,42 @@ token_balance_base() {
 
 UNITS=$(( 10 ** TOKEN_DECIMALS ))
 
+# deployment_merge_json <dotted.prefix> <json> — store every top-level key of a JSON object
+# under <prefix> in the deployment record (e.g. the output of scripts/pool.mjs).
+deployment_merge_json() {
+  python3 - "$DEPLOYMENT_FILE" "$1" "$2" <<'PY'
+import json, sys
+path, prefix, extra = sys.argv[1], sys.argv[2], json.loads(sys.argv[3])
+data = json.load(open(path))
+node = data
+for p in prefix.split("."):
+    node = node.setdefault(p, {})
+node.update({k: str(v) for k, v in extra.items()})
+with open(path, "w") as f:
+    json.dump(data, f, indent=2)
+    f.write("\n")
+PY
+}
+
+# allocation_keypair <name> — path of the local key for an allocation wallet, after checking
+# it matches the wallet in the deployment record.
+allocation_keypair() {
+  local key="$KEYS_DIR/$CLUSTER/wallets/$1.json" wallet
+  wallet="$(deployment_get_or_empty "allocations.$1.wallet")"
+  [[ -n "$wallet" ]] || die "no $1 wallet recorded; run scripts/create-wallets.sh $CLUSTER first"
+  [[ -f "$key" ]] || die "$1 wallet key not found at $key"
+  [[ "$(solana-keygen pubkey "$key")" == "$wallet" ]] || die "key at $key does not match the recorded $1 wallet"
+  echo "$key"
+}
+
+require_node_deps() {
+  command -v node >/dev/null || die "node not found (install Node.js 20+)"
+  [[ -d "$REPO_ROOT/node_modules/$1" ]] || die "dependencies missing: run 'npm ci' in $REPO_ROOT"
+}
+
+lamports_of() { sol balance "$1" --lamports | awk '{print $1}'; }
+fmt_sol() { awk "BEGIN{printf \"%.4f\", $1/1e9}"; }
+
 # deployment_set <dotted.path> <value> [<path> <value> ...] — update the record in place.
 deployment_set() {
   mkdir -p "$DEPLOYMENTS_DIR"

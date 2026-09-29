@@ -107,7 +107,48 @@ print(f"  [PASS] {name}: {whole} JOB locked, irrevocable, unlocks {day(start)} -
 PY
 }
 
-# Allocations: every distributed allocation must hold exactly its share (or be locked in vesting).
+# verify_pool <name> <wallet> <poolId> — the allocation must sit in a live JOB/SOL pool; once
+# the LP lock is recorded, the wallet must hold no LP tokens and must hold the Fee Key NFT.
+verify_pool() {
+  local name="$1" wallet="$2" pool="$3" info err nft
+  nft="$(deployment_get_or_empty "allocations.$name.pool.lock.nftMint")"
+  err="$(mktemp)"
+  if ! info="$(JC_RPC_URL="$RPC_URL" JC_POOL_ID="$pool" JC_OWNER="$wallet" JC_NFT_OWNER="$wallet" JC_NFT_MINT="$nft" \
+      node "$REPO_ROOT/scripts/pool.mjs" info 2>"$err")"; then
+    echo "  [FAIL] $name pool $pool unreadable: $(cat "$err")"
+    rm -f "$err"
+    return 1
+  fi
+  rm -f "$err"
+  python3 - "$info" "$name" "$MINT" "$pool" "$(deployment_get_or_empty "allocations.$name.pool.lock.signature")" "$nft" <<'PY'
+import json, os, sys
+p = json.loads(sys.argv[1])
+name, mint, pool, lock_sig, nft = sys.argv[2:]
+WSOL = "So11111111111111111111111111111111111111112"
+dec = int(os.environ["TOKEN_DECIMALS"])
+fail = False
+if {p["mintA"], p["mintB"]} != {mint, WSOL}:
+    print(f"  [FAIL] {name} pool {pool} is not JOB/SOL ({p['mintA']}, {p['mintB']})"); sys.exit(1)
+job, sol = (int(p["reserveA"]), int(p["reserveB"])) if p["mintA"] == mint else (int(p["reserveB"]), int(p["reserveA"]))
+if job > 0 and sol > 0:
+    print(f"  [PASS] {name}: live Raydium pool {pool} with {job / 10**dec:,.0f} JOB + {sol / 1e9:.4f} SOL")
+else:
+    print(f"  [FAIL] {name} pool {pool} has no liquidity"); fail = True
+if lock_sig:
+    if p.get("ownerLp", "0") != "0":
+        print(f"  [FAIL] {name}: lock recorded but the wallet still holds {p['ownerLp']} LP"); fail = True
+    elif nft and p.get("nftBalance") != "1":
+        print(f"  [FAIL] {name}: Fee Key NFT {nft} is not in the wallet"); fail = True
+    else:
+        print(f"  [PASS] {name}: liquidity permanently locked (Burn & Earn), Fee Key NFT in the wallet")
+else:
+    print(f"  [INFO] {name}: LP tokens not locked yet (run scripts/lock-liquidity.sh)")
+sys.exit(1 if fail else 0)
+PY
+}
+
+# Allocations: every distributed allocation must hold exactly its share (or be locked in vesting,
+# or be in the liquidity pool).
 if [[ -n "$(deployment_get_or_empty allocations)" ]]; then
   for name in $(allocation_names); do
     wallet="$(deployment_get_or_empty "allocations.$name.wallet")"
@@ -117,6 +158,8 @@ if [[ -n "$(deployment_get_or_empty allocations)" ]]; then
       echo "  [INFO] $name: wallet $wallet, not distributed yet"
     elif stream="$(deployment_get_or_empty "allocations.$name.vesting.streamId")"; [[ -n "$stream" ]]; then
       verify_vesting "$name" "$wallet" "$stream" || failures=$(( failures + 1 ))
+    elif pool="$(deployment_get_or_empty "allocations.$name.pool.poolId")"; [[ -n "$pool" ]]; then
+      verify_pool "$name" "$wallet" "$pool" || failures=$(( failures + 1 ))
     else
       target="$(allocation_amount "$name")"
       balance_base="$(token_balance_base "$wallet")"

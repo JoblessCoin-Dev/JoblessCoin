@@ -22,6 +22,7 @@
 | Metadata site hardening | `metadata/_headers`: nosniff, no framing, strict CSP, CORS only for the JSON and logo |
 
 | Team can't dump | Dev allocation in irrevocable Streamflow vesting; verified on-chain |
+| No liquidity rug | All LP tokens locked forever with Raydium Burn & Earn; verified on-chain (LP gone from wallet, Fee Key NFT held) |
 | Supply-chain | npm deps pinned exactly with a lockfile; install scripts disabled (`.npmrc`) |
 
 ### Known dependency advisories
