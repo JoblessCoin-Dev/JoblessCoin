@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>JoblessCoin | No job. No boss. No problem.</title>
+    <meta name="description" content="JoblessCoin ($JOB) is a Solana memecoin about breaking out of the 9 to 5 loop. Currently a Devnet preview with every claim verified live onchain." />
+    <meta name="theme-color" content="#0A0C0B" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="no-referrer" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="JoblessCoin ($JOB)" />
+    <meta property="og:description" content="No job. No boss. No problem. The 9 to 5 is a loop. The J breaks out." />
+    <meta property="og:image" content="https://joblesscoin-dev.github.io/JoblessCoin/brand/joblesscoin-avatar-square-400px.png" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/brand/joblesscoin-token-256px.png" />
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <canvas id="scene" aria-hidden="true"></canvas>
+
+    <div id="boot" aria-hidden="true">
+      <svg class="boot-ring" viewBox="0 0 1024 1024">
+        <circle class="boot-circle" cx="512" cy="512" r="300" />
+      </svg>
+      <p class="boot-clock"><span id="boot-time">09:00:00</span><small>clocking in</small></p>
+    </div>
+
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav" id="nav">
+      <div class="nav-inner">
+        <a class="nav-logo" href="#hero" aria-label="JoblessCoin home">
+          <img class="logo-wide" src="/brand/joblesscoin-horizontal-color-on-dark.svg" alt="JoblessCoin" width="150" height="40" />
+          <img class="logo-mark" src="/brand/joblesscoin-icon-color-on-dark.svg" alt="" width="36" height="36" />
+        </a>
+        <nav class="nav-links" id="nav-links" aria-label="Sections">
+          <a href="#loop">Loop</a>
+          <a href="#proof">Proof</a>
+          <a href="#timesheet">Timesheet</a>
+          <a href="#resign">Resign</a>
+          <a href="#clockout">Clock out</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+        <button class="boss-btn" type="button" data-boss title="Press B">Boss is coming</button>
+        <button class="menu-btn" type="button" id="menu-toggle" aria-expanded="false" aria-controls="nav-links">Menu</button>
+      </div>
+      <div class="status" role="status">
+        <span class="status-dev"><i class="dot"></i>DEVNET PREVIEW</span>
+        <span class="status-hide">test token, zero value</span>
+        <span>mint <button type="button" class="status-mint" data-copy="EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi">EfFB…4tRi</button></span>
+        <span class="status-ok"><i class="dot dot-green"></i><span id="status-verified">not checked yet</span></span>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- HERO -->
+      <section id="hero" class="hero">
+        <div class="hero-copy">
+          <p class="pill"><i class="dot"></i>DEVNET PREVIEW · TEST TOKEN · ZERO VALUE</p>
+          <h1 class="hero-title"><span>NO JOB.</span><span>NO BOSS.</span><span class="accent">NO PROBLEM.</span></h1>
+          <p class="hero-sub">The ring is the 9 to 5. Same loop, every single day. The J is you, breaking out. JoblessCoin ($JOB) is a memecoin for everyone who ever stared at the clock at 16:59.</p>
+          <div class="cta">
+            <a class="btn btn-primary" href="#proof">See the proof</a>
+            <a class="btn btn-glass" href="#resign">Write your resignation</a>
+          </div>
+        </div>
+        <img class="hero-fallback" src="/brand/joblesscoin-icon-color-on-dark.svg" alt="The JoblessCoin mark: a J breaking out of a ring" width="420" height="420" />
+        <p class="hero-hint"><span class="hint-desktop">Move your mouse. Click the ring.</span><span class="hint-touch">Touch the ring.</span> Scroll to clock out.</p>
+      </section>
+
+      <!-- THE LOOP -->
+      <section id="loop" class="section loop">
+        <div class="section-head">
+          <p class="eyebrow">The loop</p>
+          <h2>The ring is your day.</h2>
+          <p class="lead">Look at our logo again. That circle is the 9 to 5. Round and round, the same loop, until you retire or you break it.</p>
+        </div>
+        <div class="loop-grid">
+          <div class="loop-dial" aria-hidden="true">
+            <svg viewBox="0 0 1024 1024">
+              <g class="loop-ticks"></g>
+              <path class="loop-ring" d="M754.52,351.46 A336.76,336.76 0 1 1 579.21,255.12 L560.9,328.53 A261.19,261.19 0 1 0 731.55,443.61 Z" />
+              <path class="loop-seal" d="M579.21,255.12 A336.76,336.76 0 0 1 754.52,351.46 L731.55,443.61 A261.19,261.19 0 0 0 560.9,328.53 Z" />
+              <line id="loop-hand" class="loop-hand" x1="512" y1="585.1" x2="512" y2="395" />
+              <circle class="loop-pin" cx="512" cy="585.1" r="14" />
+              <path class="loop-j" d="M774.52,121.86 L659.84,581.82 C636.32,676.17 540.76,752.66 446.41,752.66 C352.05,752.66 294.64,676.17 318.16,581.82 L443.01,581.82 C436.67,607.22 452.13,627.81 477.53,627.81 C502.94,627.81 528.66,607.22 535,581.82 L649.68,121.86 Z" />
+            </svg>
+          </div>
+          <ol class="beats">
+            <li data-beat><b class="time">09:00</b><span>Clock in. Coffee number one.</span></li>
+            <li data-beat><b class="time">12:30</b><span>Sad desk lunch. Reply all.</span></li>
+            <li data-beat><b class="time">17:00</b><span>Clock out. Too tired to live.</span></li>
+            <li data-beat><b class="time">× 10,400</b><span>Repeat for 40 years. That's 5 days, 52 weeks, 40 years.</span></li>
+            <li data-beat class="beat-break"><b class="time">Or</b><span>break the loop. That's the J. It punches through the gap and never comes back. That's JoblessCoin.</span></li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- PROOF -->
+      <section id="proof" class="section">
+        <div class="section-head">
+          <p class="eyebrow">Proof, not promises</p>
+          <h2>Don't trust us. Check the chain.</h2>
+          <p class="lead">Most memecoins just tell you their liquidity is locked. Your browser checks ours right now, straight from the Solana blockchain. Every line links to the real account.</p>
+        </div>
+        <div class="terminal glass">
+          <div class="terminal-bar"><i></i><i></i><i></i><span>job diagnostics · solana devnet · read only</span></div>
+          <div class="terminal-body">
+            <p class="terminal-cmd"><span class="prompt">job@devnet:~$</span> run diagnostics on EfFB…4tRi</p>
+            <ol id="proof-lines" class="proof-lines" aria-label="Verification results"></ol>
+            <p id="proof-summary" class="proof-summary" aria-live="polite">Scroll here and the checks start by themselves.</p>
+          </div>
+          <div class="terminal-actions">
+            <button class="btn btn-glass" type="button" id="proof-rerun">Run again</button>
+            <a class="btn btn-ghost" href="https://explorer.solana.com/address/EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi?cluster=devnet" target="_blank" rel="noopener noreferrer">Open the token in Explorer</a>
+          </div>
+        </div>
+        <div class="verify glass">
+          <div>
+            <h3>Check it without our website</h3>
+            <p>Run the exact same checks from our open source code. Needs the Solana CLI on Linux or macOS.</p>
+          </div>
+          <pre class="code" id="verify-cmd"><code>git clone https://github.com/JoblessCoin-Dev/JoblessCoin
+cd JoblessCoin
+scripts/verify-token.sh devnet</code></pre>
+          <button class="btn btn-glass" type="button" data-copy="git clone https://github.com/JoblessCoin-Dev/JoblessCoin &amp;&amp; cd JoblessCoin &amp;&amp; scripts/verify-token.sh devnet" data-copy-target="verify-cmd">Copy command</button>
+        </div>
+      </section>
+
+      <!-- TIMESHEET -->
+      <section id="timesheet" class="section">
+        <div class="section-head">
+          <p class="eyebrow">The timesheet</p>
+          <h2>Where every JOB goes.</h2>
+          <p class="lead">1,000,000,000 JOB. That's all there will ever be. Hover a slice to see where it sits right now.</p>
+        </div>
+        <div class="sheet glass">
+          <div class="sheet-toggle" role="group" aria-label="Show">
+            <button type="button" data-sheet-mode="devnet" aria-pressed="true">Devnet, done</button>
+            <button type="button" data-sheet-mode="mainnet" aria-pressed="false">Mainnet, the plan</button>
+          </div>
+          <div class="sheet-grid">
+            <svg id="timesheet-dial" class="sheet-dial" viewBox="0 0 300 300" role="img" aria-label="Allocation: 90% liquidity, 5% community, 5% development">
+              <text x="150" y="146" class="dial-big">1B</text>
+              <text x="150" y="170" class="dial-small">JOB, FIXED FOREVER</text>
+            </svg>
+            <div id="timesheet-legend" class="sheet-legend"></div>
+          </div>
+          <div class="cliff">
+            <p class="eyebrow">Team tokens unlock in</p>
+            <p class="cliff-count" id="cliff-countdown">calculating</p>
+            <p class="cliff-note">First unlock on <span id="cliff-date">25 Dec 2026</span>. Then a little every day for 9 months. Nobody can cancel it, including us.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESIGN -->
+      <section id="resign" class="section">
+        <div class="section-head">
+          <p class="eyebrow">The resignation</p>
+          <h2>Write your resignation.</h2>
+          <p class="lead">Tell the loop you're out. Make a card, save it, post it. It's made on your device and nothing gets uploaded.</p>
+        </div>
+        <div class="resign glass">
+          <form id="resign-form" class="resign-form" autocomplete="off">
+            <label for="resign-name">Your name</label>
+            <input id="resign-name" name="name" maxlength="28" placeholder="Alex" />
+            <label for="resign-boss">Your boss <small>(optional)</small></label>
+            <input id="resign-boss" name="boss" maxlength="36" placeholder="Greg from accounting" />
+            <fieldset class="styles">
+              <legend>Style</legend>
+              <label><input type="radio" name="resign-style" value="paper" checked /> Paper</label>
+              <label><input type="radio" name="resign-style" value="terminal" /> Terminal</label>
+              <label><input type="radio" name="resign-style" value="neon" /> Neon</label>
+            </fieldset>
+            <div class="resign-actions">
+              <button class="btn btn-primary" type="button" id="resign-download">Download PNG</button>
+              <button class="btn btn-glass" type="button" id="resign-post">Post on X</button>
+              <button class="btn btn-ghost" type="button" id="resign-copy">Copy text</button>
+            </div>
+            <p id="resign-note" class="resign-note" aria-live="polite">Just for fun. A card doesn't mean you own JOB, and owning JOB won't pay your rent.</p>
+          </form>
+          <canvas id="resign-canvas" class="resign-canvas" role="img" aria-label="Your resignation card preview"></canvas>
+        </div>
+      </section>
+
+      <!-- CLOCK OUT -->
+      <section id="clockout" class="section">
+        <div class="section-head">
+          <p class="eyebrow">How to clock out</p>
+          <h2>JOB is in rehearsal.</h2>
+          <p class="lead">Right now JOB lives on Devnet, Solana's practice network. Here's what that means and how to check everything yourself.</p>
+        </div>
+        <ol class="steps">
+          <li class="glass"><h3>What Devnet is</h3><p>Solana's practice network. Same tech as the real one, but the coins are free test coins with zero value. Builders use it to rehearse before going live.</p></li>
+          <li class="glass"><h3>What JOB is</h3><p>A memecoin about breaking out of the 9 to 5. A joke with a real, working token behind it. No promises, no hidden utility, no roadmap to riches.</p></li>
+          <li class="glass"><h3>How the test token works</h3><p>The full setup already runs on Devnet: a fixed supply, a pool with its liquidity locked forever, team tokens in vesting and minting switched off. A dress rehearsal for Mainnet.</p></li>
+          <li class="glass step-address">
+            <h3>The verified address</h3>
+            <p class="address" id="mint-address">EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi</p>
+            <button class="btn btn-glass" type="button" data-copy="EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi" data-copy-target="mint-address">Copy address</button>
+            <p class="small">Compare every single character. Scammers make lookalikes that only match the start and the end.</p>
+          </li>
+          <li class="glass"><h3>Inspect it yourself</h3><p>Open it in <a href="https://explorer.solana.com/address/EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi?cluster=devnet" target="_blank" rel="noopener noreferrer">Solana Explorer</a> on Devnet and look around, or run the checks from our <a href="https://github.com/JoblessCoin-Dev/JoblessCoin" target="_blank" rel="noopener noreferrer">open source code</a>. Don't trust, verify.</p></li>
+        </ol>
+        <p class="warning glass">You can't buy JOB yet. There is no real market, no presale and no buy button anywhere on this site. If someone offers to sell you JOB right now, it's a scam.</p>
+      </section>
+
+      <!-- ROADMAP -->
+      <section id="roadmap" class="section">
+        <div class="section-head">
+          <p class="eyebrow">Office hours</p>
+          <h2>Where we are. What's next.</h2>
+          <p class="lead">No dates we can't keep. No price talk, ever. A stage only moves to done when it's done and you can verify it.</p>
+        </div>
+        <ol class="road">
+          <li class="stage is-done glass"><span class="stage-n">01 · Done</span><h3>Break the loop</h3><p>The name, the logo, the plan and the security setup.</p></li>
+          <li class="stage is-now glass"><span class="stage-n">02 · Now</span><h3>First escape</h3><p>The Devnet token, the full rehearsal and this website.</p></li>
+          <li class="stage glass"><span class="stage-n">03</span><h3>Build the machine</h3><p>Community channels, memes and finding our people.</p></li>
+          <li class="stage glass"><span class="stage-n">04</span><h3>Go public</h3><p>Mainnet prep: a hardware wallet, fresh wallets, legal and tax checks.</p></li>
+          <li class="stage glass"><span class="stage-n">05</span><h3>Clock out</h3><p>Mainnet launch. When it's ready, not before.</p></li>
+        </ol>
+      </section>
+
+      <!-- FAQ -->
+      <section id="faq" class="section">
+        <div class="section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>Questions, answered straight.</h2>
+        </div>
+        <div class="faq-grid">
+          <div class="faq">
+            <details><summary>What is JoblessCoin?</summary><p>A memecoin about breaking out of the 9 to 5 loop. The ring in our logo is the daily grind. The J is you, leaving it. That's the whole idea. No hidden utility, no promises.</p></details>
+            <details><summary>What is JOB?</summary><p>JOB is the ticker, and the token itself. A Solana token with a fixed supply of 1,000,000,000.</p></details>
+            <details><summary>Why Solana?</summary><p>Fast and cheap, and it has the tools to prove everything onchain, like locked liquidity and vesting. That's what makes the proof terminal above possible.</p></details>
+            <details><summary>What is Token-2022?</summary><p>Solana's newer token standard. It lets a token carry its own name and logo onchain. It also supports extra powers like transfer fees or freezing wallets. JOB uses none of them, and the terminal checks that live.</p></details>
+            <details><summary>Is this real money?</summary><p>No, not right now. JOB only exists on Devnet, Solana's test network. Devnet tokens have zero value and can't be bought or sold for real money.</p></details>
+            <details><summary>What is Devnet?</summary><p>A practice copy of Solana. Same software, free test coins. Builders use it to try everything out before touching real money. We're doing a full rehearsal there first.</p></details>
+            <details><summary>What is the total supply?</summary><p>1,000,000,000 JOB. The plan is 90% liquidity, 5% community and 5% development. On Devnet that split is already done and verified.</p></details>
+            <details><summary>Can more JOB be created?</summary><p>No. Minting is switched off forever. Nobody can ever make more, including us. The terminal checks it live every time you load this page.</p></details>
+            <details><summary>Where is the official token address?</summary><p>Only this one: <span class="address-inline">EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi</span>. It's also in our GitHub repo. Anything else is not JOB.</p></details>
+            <details><summary>How do I avoid fake JOB tokens?</summary><p>Anyone can make a token called JOB. Only the address counts. Compare every character, use the checker on this page and ignore anyone who DMs you with a deal.</p></details>
+            <details><summary>Does the website ever ask me to connect my wallet?</summary><p>Never. We will never ask you to connect your wallet on this website. No seed phrases, no private keys, no claims, no airdrops. If a site asks for any of that, close it.</p></details>
+          </div>
+          <form id="checker-form" class="checker glass" autocomplete="off">
+            <h3>Fake token checker</h3>
+            <p>Paste any token address. We'll tell you if it's the real JOB.</p>
+            <label class="sr" for="checker-input">Token address</label>
+            <input id="checker-input" placeholder="Paste a token address" spellcheck="false" />
+            <button class="btn btn-primary" type="submit">Check it</button>
+            <p id="checker-result" class="checker-result" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-top">
+        <img class="footer-logo" src="/brand/joblesscoin-lockup-tagline-color-on-dark.svg" alt="JoblessCoin. No job. No boss. No problem." width="220" height="220" loading="lazy" />
+        <div class="safety glass">
+          <p class="eyebrow eyebrow-amber">Stay safe</p>
+          <p class="safety-big">We will never ask you to connect your wallet on this website.</p>
+          <p>No seed phrases. No private keys. No claims. No airdrops. No signing. If a site asks for any of that, close it.</p>
+          <p class="address-row"><span class="address" id="footer-address">EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi</span><button class="btn btn-ghost" type="button" data-copy="EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi" data-copy-target="footer-address">Copy</button></p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>Clocked out <span data-clocked-out>a while</span> ago.</p>
+        <p><a href="https://github.com/JoblessCoin-Dev/JoblessCoin" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="https://explorer.solana.com/address/EfFBNJSuLDJLt2bU6QuxUriq5nhHgoBMYksRhWxH4tRi?cluster=devnet" target="_blank" rel="noopener noreferrer">Explorer</a> · Press B if your boss walks in.</p>
+        <p class="disclaimer">JOB is a memecoin with no intrinsic value and no expected return. Nothing on this site is financial advice. Right now JOB exists only on Solana Devnet, where tokens have zero value.</p>
+      </div>
+    </footer>
+
+    <div id="boss" class="boss" hidden tabindex="-1" role="dialog" aria-label="Spreadsheet">
+      <div class="boss-bar"><b>Q3_budget_FINAL_v7.xlsx</b><span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Data</span></div>
+      <table class="boss-sheet">
+        <thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr></thead>
+        <tbody>
+          <tr><th>1</th><td><b>Cost center</b></td><td><b>Q1</b></td><td><b>Q2</b></td><td><b>Q3</b></td><td><b>Variance</b></td><td><b>Notes</b></td></tr>
+          <tr><th>2</th><td>Office supplies</td><td>1,204.00</td><td>1,187.50</td><td>1,310.25</td><td>8.1%</td><td>see email</td></tr>
+          <tr><th>3</th><td>Printer toner</td><td>880.00</td><td>912.00</td><td>1,045.00</td><td>14.6%</td><td>pending</td></tr>
+          <tr><th>4</th><td>Team building</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.0%</td><td>postponed</td></tr>
+          <tr><th>5</th><td>Coffee</td><td>2,310.00</td><td>2,405.00</td><td>2,990.00</td><td>24.3%</td><td>why</td></tr>
+          <tr><th>6</th><td>Meetings</td><td>14,000.00</td><td>15,250.00</td><td>17,800.00</td><td>16.7%</td><td>could be email</td></tr>
+          <tr><th>7</th><td>Consultants</td><td>9,500.00</td><td>9,500.00</td><td>9,500.00</td><td>0.0%</td><td>per contract</td></tr>
+          <tr><th>8</th><td>Software licenses</td><td>3,120.00</td><td>3,120.00</td><td>3,480.00</td><td>11.5%</td><td>renewal</td></tr>
+          <tr><th>9</th><td>Travel</td><td>4,440.00</td><td>1,020.00</td><td>2,760.00</td><td>170.6%</td><td>TBD</td></tr>
+          <tr><th>10</th><td><b>Total</b></td><td><b>35,454.00</b></td><td><b>33,394.50</b></td><td><b>38,885.25</b></td><td><b>16.4%</b></td><td></td></tr>
+        </tbody>
+      </table>
+      <p class="boss-exit">Press B or Esc to get back to breaking the loop.</p>
+    </div>
+  </body>
+</html>

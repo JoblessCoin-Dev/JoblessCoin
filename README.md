@@ -49,6 +49,7 @@ scripts/finalize-mint.sh permanently disable the mint authority
 scripts/test-localnet.sh end-to-end test on a throwaway local validator
 scripts/test-hook.sh    attack-tests the pre-commit secret scanner
 deployments/            public deployment records per network
+website/                the JoblessCoin website (THE BREAKOUT), deployed to GitHub Pages
 .githooks/pre-commit    blocks commits containing private keys / API keys
 ```
 
@@ -83,6 +84,23 @@ Options (environment variables):
 The scripts never change your global Solana CLI config. They also check the RPC's genesis
 hash, so a Devnet command can't accidentally run against Mainnet, or the reverse.
 
+## Website
+
+`website/` is a static site (Vite + TypeScript + Three.js + GSAP). Every claim on it is read live
+from the chain in the visitor's browser, using the addresses in `deployments/devnet.json`.
+
+```bash
+cd website
+npm ci
+npm run dev      # local development
+npm run build    # type check + "no dashes" copy check + production build into dist/
+```
+
+Pushing to `main` deploys it through `.github/workflows/pages.yml`
+(one-time setup: repo Settings > Pages > Source: GitHub Actions).
+The site never asks for a wallet connection, keys or signatures, has no trackers or cookies,
+and ships a strict Content Security Policy.
+
 ## Safety design
 
 - **Fixed supply:** the mint authority is disabled after distribution, and `verify-token.sh --final` proves it.
@@ -102,7 +120,7 @@ See [SECURITY.md](SECURITY.md) for the full security policy and personal checkli
 2. ✅ Reproducible scripts + automated tests
 3. ✅ Devnet: create, verify, 90/5/5 allocations, dev vesting, pool + permanent LP lock, finalize
 4. ⬜ Devnet rehearsal: Squads multisig treasury
-5. ⬜ Permanent metadata (Arweave/IPFS), own domain, website with a transparency page
+5. ⏳ Website (built: THE BREAKOUT, live onchain proof) · ⬜ own domain · ⬜ permanent metadata (Arweave, right before Mainnet)
 6. ⬜ Pre-Mainnet: Ledger hardware wallet, legal/tax advice, final review
 7. ⬜ Mainnet, only as an explicit decision, using the same tested scripts
 

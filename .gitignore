@@ -11,8 +11,10 @@ CLAUDE_JOBLESSCOIN_HANDOFF.md
 *.private.md
 
 # --- Local-only / generated ---
+.claude/
 deployments/localnet.json
 deployments/archive/
 test-ledger/
 node_modules/
+website/dist/
 *.log
